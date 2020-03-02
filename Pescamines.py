@@ -1,27 +1,3 @@
-
-"""
-Recur for all 8 adjacent cells
-
-        N.W   N   N.E
-            \   |   /
-                \  |  /
-        W----Cell----E
-                / | \
-            /   |  \
-        S.W    S   S.E
-
-Cell-->Current Cell (row, col)
-N -->  North        (row-1, col)
-S -->  South        (row+1, col)
-E -->  East         (row, col+1)
-W -->  West            (row, col-1)
-N.E--> North-East   (row-1, col+1)
-N.W--> North-West   (row-1, col-1)
-S.E--> South-East   (row+1, col+1)
-S.W--> South-West   (row+1, col-1)
-"""
-
-
 import random
 
 # Configuración del tablero
@@ -69,18 +45,33 @@ def imprimirPistes(matriu, mostrarMines):
 
 # Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument.
 def minar(matriu, numero):
-    for i in range(numero):
+    while numero > 0:
         randomRow = random.randint(0, 9)
         randomCol = random.randint(0, 9)
         if matriu[randomRow][randomCol] == BOMBA:
-            i = i - 1  # para los resultados que se repiten
+            continue
         matriu[randomRow][randomCol] = BOMBA
-
+        numero = numero - 1
 
 
 # Retorna true si la posició passada està dins de la matriu.
-def dinsMatriu(matriu, fil, col):
-    return (fil < 0 or fil > LADO) and (col < 0 or col > LADO)
+def foraMatriu(matriu, fil, col):
+    side = len(matriu)
+    return fil < 0 or col < 0 or fil >= side or col >= side
+
+
+def contarMines(matriu, fil, col):
+    count = 0
+    for i in range(3):
+        for j in range(3):
+            minX = i + fil -1
+            minY = j + col -1
+            if foraMatriu(matriu, minX, minY):
+                print(f"OOB => matriu[{minX}][{minY}]")
+            else:
+                if matriu[minX][minY] == BOMBA:
+                    count = count + 1
+    return count
 
 
 # Retorna true si hi ha una mina a la posició que es passa com argument.
@@ -98,40 +89,59 @@ def marcar(matriu, fil, col):
 # Total mines marcades
 def marcades(matriu):
     marcades = 0
-    for i in range(len(matriu)):
-        for j in range(len(matriu[i])):
-            if matriu[i][j] == ">":
+    for i in matriu:
+        for j in range(len(i)):
+            if i[j] == ">":
                 marcades = marcades + 1
     return marcades
 
+def contarMines(matriu, fil, col):
+    count = 0
+    i= fil -1
+    j= col -1
+    for i in range(3):
+        for j in range(3):
+            if matriu[i][j] == BOMBA:
+                count = count + 1
+    return count
 
-
-# Despata la casella de la posició indicada.Returna si hem destapat una mina o no.
+# Despata la casella de la posició indicada. Returna si hem destapat una mina o no.
 def destapar(matriu, fil, col):
-    # cas base
-    if matriu[fil][col] != 'X':
-        return False
 
+
+    # cas base
+
+
+    # Comprobem que no estiga destapada:
+
+    if destapadaAt(matriu, fil, col):
+        return False
     # comprobem si hi ha mina
     if minaAt(matriu, fil, col):
-        matriu[fil][co] = BOMBA
+        matriu[fil][col] = BOMBA
         imprimir(matriu)
         print("Has Perdut!!")
         return True
 
+    else:
     # Loop over all surrounding cells
-    if dinsMatriu(matriu, fil, col):
+        count = 0
         minx= fil -1
         miny= col -1
-        for minx in range(fil + 2):
-            for miny in range(col + 2):
-                return
-    
+        for i in range(3):
+            for j in range(3):
+                count = count + 1
+        if count > 0:
+            matriu[fil][col] = count
+        else:
+            destapar(matriu, )
+
+
 
 
 # Retorna si la casella està o no destapada.
 def destapadaAt(matriu, fil, col):
-    return not (matriu[fil][col] == "X" or matriu[fil][col] == BOMBA or matriu[fil][col] == MARCA)
+    return matriu[fil][col] == " "
 
 
 

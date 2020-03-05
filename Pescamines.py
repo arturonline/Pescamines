@@ -5,6 +5,7 @@ LADO = 10
 ESPACIADO_HORIZONTAL = 3
 BOMBA = "@"
 MARCA = ">"
+MINAS = 5
 
 # Funcions
 
@@ -44,13 +45,13 @@ def imprimirPistes(matriu, mostrarMines: bool):
 
 
 # Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument.
-def minar(matriu, numero: int) -> None:
-    while numero > 0:
+def minar(matriu, minas: int) -> None:
+    while minas > 0:
         randomRow = random.randint(0, 9)
         randomCol = random.randint(0, 9)
         if not matriu[randomRow][randomCol] == BOMBA:
             matriu[randomRow][randomCol] = BOMBA
-            numero = numero - 1
+            minas = minas - 1
 
 
 # Retorna true si la posició passada està dins de la matriu.
@@ -74,7 +75,10 @@ def contarMines(matriu, fil: int, col: int) -> int:
 
 # Marca o desmarca una casilla com a possibilitat de mina.
 def marcar(matriu, fil: int, col: int):
-    matriu[fil][col] = MARCA
+    if matriu[fil][col] == "X":
+        matriu[fil][col] = ">"
+    else:
+        print("Error: casella no valida")
     return
 
 
@@ -106,7 +110,7 @@ def destapar(matriuJugador, matriuMines, fil: int, col: int):
         matriuJugador[fil][col] = str(mines)
         return False
     else:
-        matriuJugador[fil][col] = " "
+        matriuJugador[fil][col] = "."
         for i in range(3):
             for j in range(3):
                 minX = i + fil -1
@@ -115,7 +119,7 @@ def destapar(matriuJugador, matriuMines, fil: int, col: int):
 
 # Retorna si la casella està o no destapada.
 def destapadaAt(matriu, fil: int, col: int) -> bool:
-    return matriu[fil][col] == " "
+    return matriu[fil][col] == "."
 
 
 # Retorna quantes caselles hi han destapades.
@@ -123,7 +127,7 @@ def destapades(matriu) -> int:
     destapades = 0
     for i in range(len(matriu)):
         for j in range(len(matriu[i])):
-            if destapadaAt(matriu, i, j):
+            if matriu[i][j] == "." or matriu[i][j].isdigit() :
                 destapades = destapades + 1
     return destapades
 
@@ -159,28 +163,33 @@ def triarFilaColumna():
 
 # menu de joc
 def jugar(matriuJugador, matriuMines):
-    jugada = triarMarcarDestapar()
-    fila, columna = triarFilaColumna()
-    if jugada == "m":
-        marcar(matriuJugador, fila, columna)
+    while True:
+        jugada = triarMarcarDestapar()
+        fila, columna = triarFilaColumna()
+        if jugada == "m":
+            marcar(matriuJugador, fila, columna)
+
+        if jugada == "d":
+            # comprobem si hi ha mina
+            if minaAt(matriuMines, fila, columna):
+                matriuJugador[fila][columna] = BOMBA
+                imprimir(matriuJugador)
+                print("Has Perdut!!")
+                return
+            else:
+                destapar(matriuJugador, matriuMines, fila, columna)
+
         imprimir(matriuJugador)
+        totalMarcades = marcades(matriuJugador)
+        totalDestapades = destapades(matriuJugador)
+        total = totalMarcades + totalDestapades
+        print("Marcades = " + str(totalMarcades) )
+        print("Destapades = " + str(totalDestapades) )
+        print("Total = " + str(total))
 
-    if jugada == "d":
-        # comprobem si hi ha mina
-        if minaAt(matriuMines, fila, columna):
-            matriuJugador[fila][columna] = BOMBA
-            imprimir(matriuJugador)
-            print("Has Perdut!!")
+        if totalDestapades == (LADO * LADO) - MINAS:
+            print("Has guanyat!!")
             return
-        else:
-            destapar(matriuJugador, matriuMines, fila, columna)
-            imprimir(matriuJugador)
-
-
-    imprimir(matriuJugador)
-    print("Marcades = " + str(marcades(matriuJugador)) )
-    print("Destapades = " + str(destapades(matriuJugador)) )
-    print("Total = " + str((marcades(matriuJugador) + destapades(matriuJugador))))
 
 def començarPartida():
     # Creem 2 matrius, la que veu el jugador, taulerJugador, y la que te les respostes, taulerPistes
@@ -188,14 +197,14 @@ def començarPartida():
     taulerMines = [["X" for i in range(LADO)] for j in range(LADO)]
 
     # afegim les mines aleatoriament
-    minar(taulerMines, 25)
+    minar(taulerMines, MINAS)
 
-    imprimir(taulerMines)
+    #imprimir(taulerMines)
+
     # Ensenyem tauler al jugador
     imprimir(taulerJugador)
 
-    while True:
-        jugar(taulerJugador, taulerMines)
+    jugar(taulerJugador, taulerMines)
 
 # Punt d'entrada del programa
 començarPartida()

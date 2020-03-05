@@ -36,7 +36,7 @@ def imprimir(matriu):
 
 
 # Mostra el tauler de les pistes. Depenent del booleà es mostraran o no les mines.
-def imprimirPistes(matriu, mostrarMines):
+def imprimirPistes(matriu, mostrarMines: bool):
     if mostrarMines:
         imprimir(matriu)
     return
@@ -44,50 +44,42 @@ def imprimirPistes(matriu, mostrarMines):
 
 
 # Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument.
-def minar(matriu, numero):
+def minar(matriu, numero: int) -> None:
     while numero > 0:
         randomRow = random.randint(0, 9)
         randomCol = random.randint(0, 9)
-        if matriu[randomRow][randomCol] == BOMBA:
-            continue
-        matriu[randomRow][randomCol] = BOMBA
-        numero = numero - 1
+        if not matriu[randomRow][randomCol] == BOMBA:
+            matriu[randomRow][randomCol] = BOMBA
+            numero = numero - 1
 
 
 # Retorna true si la posició passada està dins de la matriu.
-def foraMatriu(matriu, fil, col):
+
+def estaDins(matriu, fil: int, col: int) -> bool:
     side = len(matriu)
-    return fil < 0 or col < 0 or fil >= side or col >= side
+    return fil >= 0 and col >= 0 and fil < side and col < side
 
 
-def contarMines(matriu, fil, col):
+def contarMines(matriu, fil: int, col: int) -> int:
     count = 0
     for i in range(3):
         for j in range(3):
             minX = i + fil -1
             minY = j + col -1
-            if foraMatriu(matriu, minX, minY):
-                print(f"OOB => matriu[{minX}][{minY}]")
-            else:
-                if matriu[minX][minY] == BOMBA:
-                    count = count + 1
+            if minX == fil and minY == col:
+                    continue
+            if estaDins(matriu, minX, minY) and minaAt(matriu, minX, minY):
+                count = count + 1
     return count
 
-
-# Retorna true si hi ha una mina a la posició que es passa com argument.
-def minaAt(matriu, fil, col):
-    return matriu[fil][col] == BOMBA
-
-
-
 # Marca o desmarca una casilla com a possibilitat de mina.
-def marcar(matriu, fil, col):
+def marcar(matriu, fil: int, col: int):
     matriu[fil][col] = MARCA
     return
 
 
 # Total mines marcades
-def marcades(matriu):
+def marcades(matriu) -> int:
     marcades = 0
     for i in matriu:
         for j in range(len(i)):
@@ -95,58 +87,39 @@ def marcades(matriu):
                 marcades = marcades + 1
     return marcades
 
-def contarMines(matriu, fil, col):
-    count = 0
-    i= fil -1
-    j= col -1
-    for i in range(3):
-        for j in range(3):
-            if matriu[i][j] == BOMBA:
-                count = count + 1
-    return count
 
 # Despata la casella de la posició indicada. Returna si hem destapat una mina o no.
-def destapar(matriu, fil, col):
+def minaAt(matriuMines, fil: int, col: int) -> bool:
+    return matriuMines[fil][col] == BOMBA
 
-
-    # cas base
-
-
-    # Comprobem que no estiga destapada:
-
-    if destapadaAt(matriu, fil, col):
+def destapar(matriuJugador, matriuMines, fil: int, col: int):
+    if not estaDins(matriuJugador, fil, col):
         return False
-    # comprobem si hi ha mina
-    if minaAt(matriu, fil, col):
-        matriu[fil][col] = BOMBA
-        imprimir(matriu)
-        print("Has Perdut!!")
+    if destapadaAt(matriuJugador, fil, col):
+        return False
+    if minaAt(matriuMines, fil, col):
+        print("BOOM!")
         return True
 
+    mines = contarMines(matriuMines, fil, col)
+    if mines > 0:
+        matriuJugador[fil][col] = str(mines)
+        return False
     else:
-    # Loop over all surrounding cells
-        count = 0
-        minx= fil -1
-        miny= col -1
+        matriuJugador[fil][col] = " "
         for i in range(3):
             for j in range(3):
-                count = count + 1
-        if count > 0:
-            matriu[fil][col] = count
-        else:
-            destapar(matriu, )
-
-
-
+                minX = i + fil -1
+                minY = j + col -1
+                destapar(matriuJugador, matriuMines, minX, minY)
 
 # Retorna si la casella està o no destapada.
-def destapadaAt(matriu, fil, col):
+def destapadaAt(matriu, fil: int, col: int) -> bool:
     return matriu[fil][col] == " "
 
 
-
 # Retorna quantes caselles hi han destapades.
-def destapades(matriu):
+def destapades(matriu) -> int:
     destapades = 0
     for i in range(len(matriu)):
         for j in range(len(matriu[i])):
@@ -154,40 +127,75 @@ def destapades(matriu):
                 destapades = destapades + 1
     return destapades
 
+def triarMarcarDestapar():
+    while True:
+        opcio = input("Vols destapar o marcar una casella? ( d/m ) ")
+        if not (opcio.lower() == "d" or opcio.lower() == "m"):
+            print("Error, torna a probar")
+            continue
+        return opcio
+
+def entreZeroINou(num):
+    return num <= 9 and num >= 0
+
+def triarFilaColumna():
+    fila = 0
+    columna = 0
+    while True:
+        input_fila = input("Tria la Fila 0-9: ")
+        input_columna = input("Tria la Columna 0-9: ")
+        try:
+            fila = int(input_fila)
+            columna = int(input_columna)
+            if not (entreZeroINou(fila) and entreZeroINou(columna)):
+                print("Valor fuera de rango. Prueba de nuevo.")
+                continue
+        except:
+            print("Error, no es un numero. Prueba de nuevo.")
+            continue
+        break
+
+    return fila, columna
 
 # menu de joc
-def mostrarMenu(matriu):
-    # opcio = input("Vols destapar o marcar una casella? ( d/m ) ")
-    # while True:
-    #     opcio = input("Vols destapar o marcar una casella? ( d/m ) ")
-    #     if not (opcio.lower() == "d" or opcio.lower() == "m"):
-    #         print("Error, torna a probar")
-    #         continue
-    #     break
-    # Aqui marquem casella o desmarquem casella
-    while True:
-        try:
-            fila = int(input("Trial la Fila 0-9: "))
-            columna  = int(input("Tria la Columna 0-9: "))
-        except:
-            print("Error, torna a probar")
-        break
-    print("Marcades =  " + str(marcades(matriu)))
-    print("Destapades = " + str(destapades(matriu)))
-    print("Total = ")
+def jugar(matriuJugador, matriuMines):
+    jugada = triarMarcarDestapar()
+    fila, columna = triarFilaColumna()
+    if jugada == "m":
+        marcar(matriuJugador, fila, columna)
+        imprimir(matriuJugador)
+
+    if jugada == "d":
+        # comprobem si hi ha mina
+        if minaAt(matriuMines, fila, columna):
+            matriuJugador[fila][columna] = BOMBA
+            imprimir(matriuJugador)
+            print("Has Perdut!!")
+            return
+        else:
+            destapar(matriuJugador, matriuMines, fila, columna)
+            imprimir(matriuJugador)
+
+
+    imprimir(matriuJugador)
+    print("Marcades = " + str(marcades(matriuJugador)) )
+    print("Destapades = " + str(destapades(matriuJugador)) )
+    print("Total = " + str((marcades(matriuJugador) + destapades(matriuJugador))))
 
 def començarPartida():
     # Creem 2 matrius, la que veu el jugador, taulerJugador, y la que te les respostes, taulerPistes
     taulerJugador = [["X" for i in range(LADO)] for j in range(LADO)]
-    taulerPistes = [["X" for i in range(LADO)] for j in range(LADO)]
+    taulerMines = [["X" for i in range(LADO)] for j in range(LADO)]
 
     # afegim les mines aleatoriament
-    minar(taulerPistes, 25)
+    minar(taulerMines, 25)
 
-    gameOver = False
-    while gameOver:
-        imprimir(taulerJugador)
-        mostrarMenu(taulerJugador)
+    imprimir(taulerMines)
+    # Ensenyem tauler al jugador
+    imprimir(taulerJugador)
+
+    while True:
+        jugar(taulerJugador, taulerMines)
 
 # Punt d'entrada del programa
 començarPartida()

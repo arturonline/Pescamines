@@ -1,16 +1,16 @@
 import random
 
-# Configuración del tablero
-LADO = 10
+# Configuració del tauler
+COSTAT = 10
 ESPACIADO_HORIZONTAL = 3
 BOMBA = "@"
 MARCA = ">"
-MINAS = 5
+MINES = 5
 
 # Funcions
 
-# mostra capçalera
 def printLiniaNumeros():
+    """Dibuixa una linia de números"""
     numeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     # primera fila en numeros
     fila1 = " " * 3
@@ -18,11 +18,11 @@ def printLiniaNumeros():
         fila1 = fila1 + str(i).ljust(ESPACIADO_HORIZONTAL, " ")
     print(fila1)
 
-# Mostra per pantalla una matriu. Esposarà tant dalt, baix,a dreta i a esquerre el numero de fila.
 def imprimir(matriu):
+    """Mostra per pantalla una matriu."""
     # titol
     print()
-    print('Pescamines'.center(ESPACIADO_HORIZONTAL * LADO + 4, '-'))
+    print('Pescamines'.center(ESPACIADO_HORIZONTAL * COSTAT + 4, '-'))
     print()
 
     printLiniaNumeros()
@@ -36,32 +36,33 @@ def imprimir(matriu):
     print()
 
 
-# Mostra el tauler de les pistes. Depenent del booleà es mostraran o no les mines.
-def imprimirPistes(matriu, mostrarMines: bool):
-    if mostrarMines:
-        imprimir(matriu)
-    return
+# def imprimirPistes(matriu, mostrarMines: bool):
+##     """Mostra el tauler de les pistes. Depenent del booleà es mostraran o no les mines."""
+#     if mostrarMines:
+#         imprimir(matriu)
+#     return
 
 
 
-# Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument.
-def minar(matriu, minas: int) -> None:
-    while minas > 0:
+def minar(matriu, minEs: int) -> None:
+    """Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument."""
+    while minEs > 0:
         randomRow = random.randint(0, 9)
         randomCol = random.randint(0, 9)
         if not matriu[randomRow][randomCol] == BOMBA:
             matriu[randomRow][randomCol] = BOMBA
-            minas = minas - 1
+            minEs = minEs - 1
 
 
-# Retorna true si la posició passada està dins de la matriu.
 
 def estaDins(matriu, fil: int, col: int) -> bool:
+    """Retorna true si la posició passada està dins de la matriu."""
     side = len(matriu)
     return fil >= 0 and col >= 0 and fil < side and col < side
 
 
 def contarMines(matriu, fil: int, col: int) -> int:
+    """Conta el número de mines alrededor de una posició passada com argument."""
     count = 0
     for i in range(3):
         for j in range(3):
@@ -73,8 +74,8 @@ def contarMines(matriu, fil: int, col: int) -> int:
                 count = count + 1
     return count
 
-# Marca o desmarca una casilla com a possibilitat de mina.
 def marcar(matriu, fil: int, col: int):
+    """Marca o desmarca una casilla com a possibilitat de mina."""
     if matriu[fil][col] == "X":
         matriu[fil][col] = ">"
     else:
@@ -82,8 +83,8 @@ def marcar(matriu, fil: int, col: int):
     return
 
 
-# Total mines marcades
 def marcades(matriu) -> int:
+    """Retorna el total de mines marcades."""
     marcades = 0
     for i in matriu:
         for j in range(len(i)):
@@ -92,11 +93,12 @@ def marcades(matriu) -> int:
     return marcades
 
 
-# Despata la casella de la posició indicada. Returna si hem destapat una mina o no.
 def minaAt(matriuMines, fil: int, col: int) -> bool:
+    """Retorna si hem destapat una mina a la posició passada."""
     return matriuMines[fil][col] == BOMBA
 
 def destapar(matriuJugador, matriuMines, fil: int, col: int):
+    """Despata la casella de la posició indicada."""
     if not estaDins(matriuJugador, fil, col):
         return False
     if destapadaAt(matriuJugador, fil, col):
@@ -117,13 +119,13 @@ def destapar(matriuJugador, matriuMines, fil: int, col: int):
                 minY = j + col -1
                 destapar(matriuJugador, matriuMines, minX, minY)
 
-# Retorna si la casella està o no destapada.
 def destapadaAt(matriu, fil: int, col: int) -> bool:
+    """Retorna si la casella està destapadada a la posició passada."""
     return matriu[fil][col] == "."
 
 
-# Retorna quantes caselles hi han destapades.
 def destapades(matriu) -> int:
+    """Retorna quantes caselles hi han destapades."""
     destapades = 0
     for i in range(len(matriu)):
         for j in range(len(matriu[i])):
@@ -132,6 +134,7 @@ def destapades(matriu) -> int:
     return destapades
 
 def triarMarcarDestapar():
+    """Durant la partida presenta al usuari la opció de destapar o marcar"""
     while True:
         opcio = input("Vols destapar o marcar una casella? ( d/m ) ")
         if not (opcio.lower() == "d" or opcio.lower() == "m"):
@@ -139,10 +142,12 @@ def triarMarcarDestapar():
             continue
         return opcio
 
-def entreZeroINou(num):
+def entreZeroINou(num)-> bool:
+    """Retorna si un número esta entre 0 i 9 ambdos inclosos"""
     return num <= 9 and num >= 0
 
 def triarFilaColumna():
+    """Durant la partida presenta al usuari la opció per triar fila o columna"""
     fila = 0
     columna = 0
     while True:
@@ -161,8 +166,8 @@ def triarFilaColumna():
 
     return fila, columna
 
-# menu de joc
 def jugar(matriuJugador, matriuMines):
+    """Presenta els menus de joc per al usuari i fa seguiment i control de la partida."""
     while True:
         jugada = triarMarcarDestapar()
         fila, columna = triarFilaColumna()
@@ -187,17 +192,18 @@ def jugar(matriuJugador, matriuMines):
         print("Destapades = " + str(totalDestapades) )
         print("Total = " + str(total))
 
-        if totalDestapades == (LADO * LADO) - MINAS:
+        if totalDestapades == (COSTAT * COSTAT) - MINES:
             print("Has guanyat!!")
             return
 
-def començarPartida():
-    # Creem 2 matrius, la que veu el jugador, taulerJugador, y la que te les respostes, taulerPistes
-    taulerJugador = [["X" for i in range(LADO)] for j in range(LADO)]
-    taulerMines = [["X" for i in range(LADO)] for j in range(LADO)]
+def Començar():
+    """Punt d'entrada del programa. Initialitza les matrius i llança les rutines per a començar a jugar"""
+    # Creem 2 matrius, la que veu el jugador, taulerJugador, y la que te les mines, taulerMines
+    taulerJugador = [["X" for i in range(COSTAT)] for j in range(COSTAT)]
+    taulerMines = [["X" for i in range(COSTAT)] for j in range(COSTAT)]
 
     # afegim les mines aleatoriament
-    minar(taulerMines, MINAS)
+    minar(taulerMines, MINES)
 
     #imprimir(taulerMines)
 
@@ -206,5 +212,4 @@ def començarPartida():
 
     jugar(taulerJugador, taulerMines)
 
-# Punt d'entrada del programa
-començarPartida()
+Començar()

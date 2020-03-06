@@ -1,4 +1,5 @@
-import random, sys
+import random
+from colorama import Fore, Back, Style
 
 # Configuració del tauler
 COSTAT = 10
@@ -6,13 +7,14 @@ ESPACIADO_HORIZONTAL = 4
 BOMBA = '⨶'
 MARCA = '▶'
 MINES = 5
+TITOL = " Ρescamines "
 
 # Funcions per a dibuixar el tauler de joc
 
 def mostrarTitol():
     """Dibuixa la linia de la capçalera amb el nom del joc"""
     print()
-    print(' Pescamines '.center(ESPACIADO_HORIZONTAL * COSTAT + 7, '='))
+    print(Style.BRIGHT + TITOL.center(ESPACIADO_HORIZONTAL * COSTAT + 7, 'Ξ') + Style.RESET_ALL)
     print()
 
 def printLiniaNumeros():
@@ -21,7 +23,7 @@ def printLiniaNumeros():
     fila = " " * 5
     for i in numeros:
         fila = fila + str(i).ljust(ESPACIADO_HORIZONTAL, " ")
-    print(fila)
+    print(Fore.BLUE + fila + Style.RESET_ALL)
 
 def printLlimitSuperior():
     """Dibuixa la primera linia de simbols que conformen les caselles"""
@@ -54,11 +56,11 @@ def printLinia(matriu):
     """Dibuixa el contingut de la matriu en les caselles i el separa"""
     fila = ""
     for row in range(len(matriu)):
-        fila = str(row) + "  ║ "
+        fila = Fore.RED + str(row) + Style.RESET_ALL + "  ║ "
         for col in range(len(matriu[row])):
             fila = fila + matriu[row][col] + " ║ "
 
-        print(fila + " " + str(row))
+        print(fila + " " + Fore.RED + str(row) + Style.RESET_ALL)
         if row != len(matriu) - 1:
             printLiniaIntermitja()
 
@@ -81,14 +83,14 @@ def imprimir(matrix):
 
 # Funcions per a fer comprobacions
 
-def minar(matriu, minEs: int) -> None:
+def minar(matriu, mines: int) -> None:
     """Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument."""
-    while minEs > 0:
-        randomRow = random.randint(0, 9)
-        randomCol = random.randint(0, 9)
+    while mines > 0:
+        randomRow = random.randint(0, COSTAT -1)
+        randomCol = random.randint(0, COSTAT -1)
         if not matriu[randomRow][randomCol] == BOMBA:
             matriu[randomRow][randomCol] = BOMBA
-            minEs = minEs - 1
+            mines = mines - 1
 
 
 
@@ -114,7 +116,7 @@ def contarMines(matriu, fil: int, col: int) -> int:
 def marcar(matriu, fil: int, col: int):
     """Marca o desmarca una casilla com a possibilitat de mina."""
     if matriu[fil][col] == "X":
-        matriu[fil][col] = ">"
+        matriu[fil][col] = Fore.GREEN + ">" + Style.RESET_ALL
     else:
         print("Error: casella no valida")
     return
@@ -173,7 +175,7 @@ def destapades(matriu) -> int:
 def triarMarcarDestapar():
     """Durant la partida presenta al usuari la opció de destapar o marcar"""
     while True:
-        opcio = input("Vols destapar o marcar una casella? ( d/m ) ")
+        opcio = input("  ▶ Vols destapar o marcar una casella? ( d/m ) ")
         if not (opcio.lower() == "d" or opcio.lower() == "m"):
             print("Error, torna a probar")
             continue
@@ -190,8 +192,8 @@ def triarFilaColumna():
     fila = 0
     columna = 0
     while True:
-        input_fila = input("Tria la Fila 0-9: ")
-        input_columna = input("Tria la Columna 0-9: ")
+        input_fila = input(Fore.RED + "  ↪ Tria la Fila 0-9: " + Style.RESET_ALL)
+        input_columna = input(Fore.BLUE + "  ↪ Tria la Columna 0-9: " + Style.RESET_ALL)
         try:
             fila = int(input_fila)
             columna = int(input_columna)
@@ -227,12 +229,14 @@ def jugar(matriuJugador, matriuMines):
         totalMarcades = marcades(matriuJugador)
         totalDestapades = destapades(matriuJugador)
         total = totalMarcades + totalDestapades
-        print("Marcades = " + str(totalMarcades) )
-        print("Destapades = " + str(totalDestapades) )
-        print("Total = " + str(total))
-
+        print("  ■ Marcades".ljust((COSTAT + 1) * 4, '.') + str(totalMarcades) )
+        print("  ■ Destapades".ljust((COSTAT + 1) * 4, '.') + str(totalDestapades) )
+        print("  ■ Total".ljust((COSTAT + 1) * 4,'.') + str(total))
+        print()
         if totalDestapades == (COSTAT * COSTAT) - MINES:
-            print("Has guanyat!!")
+            print(Fore.MAGENTA + "Has guanyat!!".center(50) )
+            print("Final de Partida".center(50) + Style.RESET_ALL)
+            print()
             return
 
 def Començar():

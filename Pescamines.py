@@ -1,37 +1,74 @@
-import random
+import random, sys
 
 # Configuració del tauler
 COSTAT = 10
-ESPACIADO_HORIZONTAL = 3
-BOMBA = "@"
-MARCA = ">"
+ESPACIADO_HORIZONTAL = 4
+BOMBA = '⨶'
+MARCA = '▶'
 MINES = 5
 
-# Funcions
+# Funcions per a dibuixar el tauler de joc
+
+def mostrarTitol():
+    """Dibuixa la linia de la capçalera amb el nom del joc"""
+    print()
+    print(' Pescamines '.center(ESPACIADO_HORIZONTAL * COSTAT + 7, '='))
+    print()
 
 def printLiniaNumeros():
     """Dibuixa una linia de números"""
-    numeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    # primera fila en numeros
-    fila1 = " " * 3
+    numeros = [i for i in range(COSTAT)]
+    fila = " " * 5
     for i in numeros:
-        fila1 = fila1 + str(i).ljust(ESPACIADO_HORIZONTAL, " ")
-    print(fila1)
+        fila = fila + str(i).ljust(ESPACIADO_HORIZONTAL, " ")
+    print(fila)
 
-def imprimir(matriu):
-    """Mostra per pantalla una matriu."""
-    # titol
-    print()
-    print('Pescamines'.center(ESPACIADO_HORIZONTAL * COSTAT + 4, '-'))
-    print()
+def printLlimitSuperior():
+    """Dibuixa la primera linia de simbols que conformen les caselles"""
+    sostre_inici = "╔═"
+    sostre_mitja = "══╦═"
+    sostre_final = "══╗"
+    for i in range(COSTAT):
+        fila = "   " + sostre_inici + sostre_mitja * (COSTAT -1) + sostre_final
+    print(fila)
 
-    printLiniaNumeros()
+def printLlimitInferior():
+    """Dibuixa la ultima linia de simbols que conformen les caselles"""
+    sol_inici = "╚═"
+    sol_mitja = "══╩═"
+    sol_final = "══╝"
+    for i in range(COSTAT):
+        fila = "   " + sol_inici + sol_mitja * (COSTAT -1) + sol_final
+    print(fila)
+
+def printLiniaIntermitja():
+    """Dibuixa la linia intermitja de simbols que conformen les caselles"""
+    mitja_inici = "╠═"
+    mitja_mitja = "══╬═"
+    mitja_final = "══╣"
+    for i in range(COSTAT):
+        fila = "   " + mitja_inici + mitja_mitja * (COSTAT -1) + mitja_final
+    print(fila)
+
+def printLinia(matriu):
+    """Dibuixa el contingut de la matriu en les caselles i el separa"""
     fila = ""
     for row in range(len(matriu)):
-        fila = str(row) + " " * 2
+        fila = str(row) + "  ║ "
         for col in range(len(matriu[row])):
-            fila = fila + matriu[row][col].ljust(ESPACIADO_HORIZONTAL, " ")
-        print(fila + str(row))
+            fila = fila + matriu[row][col] + " ║ "
+
+        print(fila + " " + str(row))
+        if row != len(matriu) - 1:
+            printLiniaIntermitja()
+
+def imprimir(matrix):
+    """Imprimix una matriu pasada con parametre"""
+    mostrarTitol()
+    printLiniaNumeros()
+    printLlimitSuperior()
+    printLinia(matrix)
+    printLlimitInferior()
     printLiniaNumeros()
     print()
 
@@ -42,7 +79,7 @@ def imprimir(matriu):
 #         imprimir(matriu)
 #     return
 
-
+# Funcions per a fer comprobacions
 
 def minar(matriu, minEs: int) -> None:
     """Ompli la matriu demanera aleatòria amb un numero de mines indicat com argument."""
@@ -146,6 +183,8 @@ def entreZeroINou(num)-> bool:
     """Retorna si un número esta entre 0 i 9 ambdos inclosos"""
     return num <= 9 and num >= 0
 
+# Funcions per a inicialitzar el joc i els menus
+
 def triarFilaColumna():
     """Durant la partida presenta al usuari la opció per triar fila o columna"""
     fila = 0
@@ -204,8 +243,6 @@ def Començar():
 
     # afegim les mines aleatoriament
     minar(taulerMines, MINES)
-
-    #imprimir(taulerMines)
 
     # Ensenyem tauler al jugador
     imprimir(taulerJugador)

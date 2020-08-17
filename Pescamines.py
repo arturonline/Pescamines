@@ -74,13 +74,6 @@ def imprimir(matrix):
     printLiniaNumeros()
     print()
 
-
-# def imprimirPistes(matriu, mostrarMines: bool):
-##     """Mostra el tauler de les pistes. Depenent del booleà es mostraran o no les mines."""
-#     if mostrarMines:
-#         imprimir(matriu)
-#     return
-
 # Funcions per a fer comprobacions
 
 def minar(matriu, mines: int) -> None:
